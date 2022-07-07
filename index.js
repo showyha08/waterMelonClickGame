@@ -1,19 +1,21 @@
 function main() {
   const canvas = document.getElementById("renderCanvas");
   const engine = new BABYLON.Engine(canvas);
-  const initialTime = 3;
+  const initialTime = 10;
   const initialPoint = 0;
-  let timeLimit = initialTime;
-  let point = initialPoint;
-  let startFlg = false;
   function createScene() {
     const scene = new BABYLON.Scene(engine);
-    // GUI
-    var advancedTexture =
+    // babylon.jsでGUI使う
+    const advancedTexture =
       BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-    // スコア
-    var scoreBlock = new BABYLON.GUI.TextBlock();
+    // 初期設定
+    let timeLimit = initialTime;
+    let point = initialPoint;
+    let startFlg = false;
+
+    // スコア表示
+    const scoreBlock = new BABYLON.GUI.TextBlock();
     scoreBlock.text = point + "pt";
     scoreBlock.fontSize = 20;
     scoreBlock.top = -220;
@@ -21,8 +23,8 @@ function main() {
     scoreBlock.color = "black";
     advancedTexture.addControl(scoreBlock);
 
-    // カウントダウン
-    var timerblock = new BABYLON.GUI.TextBlock();
+    // カウントダウン表示
+    const timerblock = new BABYLON.GUI.TextBlock();
     timerblock.text = "Time:" + timeLimit;
     timerblock.fontSize = 20;
     timerblock.top = -220;
@@ -30,27 +32,29 @@ function main() {
     timerblock.color = "black";
     advancedTexture.addControl(timerblock);
 
-    var guideblock = document.createElement("p");
+    // ガイドテキスト表示
+    const guideblock = document.createElement("p");
     guideblock.textContent = "click watermelon to game start";
     guideblock.style.top = "200px";
     guideblock.style.left = "260px";
     guideblock.style.color = "white";
-	guideblock.style.fontSize = "large";
+	  guideblock.style.fontSize = "large";
     guideblock.style.position = "absolute";
     document.body.appendChild(guideblock);
 
-    //リセットボタン
-    var restartButtom = BABYLON.GUI.Button.CreateSimpleButton("Reset", "Reset");
+    // リセットボタン表示
+    const restartButtom = BABYLON.GUI.Button.CreateSimpleButton("Reset", "Reset");
     restartButtom.width = "150px";
     restartButtom.height = "40px";
-    // ボタン位置調整
     restartButtom.top = "210";
     restartButtom.color = "white";
     restartButtom.cornerRadius = 20;
     restartButtom.background = "green";
+
+    // クリック時のイベントを設定
     restartButtom.onPointerUpObservable.add(function () {
-      sphere.position.x = 0;
-      sphere.position.z = 0;
+      watermelon.position.x = 0;
+      watermelon.position.z = 0;
       point = initialPoint;
       scoreBlock.text = point + "pt";
       timeLimit = initialTime;
@@ -60,7 +64,7 @@ function main() {
     });
     advancedTexture.addControl(restartButtom);
 
-    /**** Set camera and light *****/
+    // カメラとライトの設定
     const camera = new BABYLON.ArcRotateCamera(
       "camera",
       -Math.PI / 2,
@@ -75,6 +79,8 @@ function main() {
     );
     camera.upperBetaLimit = Math.PI / 2.2;
 
+    // スカイボックスの設定
+    // 立方体の内側の面にテクスチャを貼り付ける
     const skybox = BABYLON.MeshBuilder.CreateBox(
       "TropicalSunnyDay",
       { size: 150 },
@@ -95,12 +101,6 @@ function main() {
     skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
     skybox.material = skyboxMaterial;
 
-    /**** Materials *****/
-
-    // 砂色の地面
-    const groundMat = new BABYLON.StandardMaterial("groundMat");
-    groundMat.diffuseColor = new BABYLON.Color3(0.8, 0.76, 0.63);
-
     // 砂浜
     const sandyBeach = new BABYLON.StandardMaterial("largeGroundMat");
     sandyBeach.diffuseTexture = new BABYLON.Texture("./textures/sandyBeach.jpeg");
@@ -113,33 +113,30 @@ function main() {
     );
     largeGround.material = sandyBeach;
 
-    // スイカ
-    const sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {});
-    sphere.position.y = 1.05;
-    const waterMelonTexture = new BABYLON.StandardMaterial("waterMelonTexture");
-    waterMelonTexture.diffuseTexture = new BABYLON.Texture(
+    // 球体を生成
+    const watermelon = BABYLON.MeshBuilder.CreateSphere("watermelon", {});
+    watermelon.position.y = 1.05;
+    // スイカ柄のテクスチャを貼る
+    const watermelonTexture = new BABYLON.StandardMaterial("watermelonTexture");
+    watermelonTexture.diffuseTexture = new BABYLON.Texture(
       "./textures/waterMelonPattern.png"
     );
-    sphere.material = waterMelonTexture;
-    sphere.actionManager = new BABYLON.ActionManager(scene);
-    sphere.actionManager.registerAction(
+    watermelon.material = watermelonTexture;
+    watermelon.actionManager = new BABYLON.ActionManager(scene);
+    watermelon.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger,
         function (evt) {
           if (timeLimit > 0) startFlg = true;
           if (!startFlg) return;
           guideblock.style.display = "none";
-          const sourceSphere = evt.meshUnderPointer;
-          //現在地から
-          const max = 9;
-          const x = getRandomCoordinate(max);
-          const y = getRandomCoordinate(max);
 
-          //スイカを動かす
-          sphere.position.x = x;
-          sphere.position.z = y;
+          // 最大座標の範囲内でスイカを動かす
+          const maxCoordinate = 9;
+          watermelon.position.x = getRandomCoordinate(maxCoordinate);
+          watermelon.position.z = getRandomCoordinate(maxCoordinate);
 
-		  //スコア更新
+		      // スコア更新
           point++;
           scoreBlock.text = point + "pt";
           advancedTexture.unRegisterClipboardEvents();
