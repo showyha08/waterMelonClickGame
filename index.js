@@ -35,8 +35,8 @@ function main() {
     // ガイドテキスト表示
     const guideblock = document.createElement("p");
     guideblock.textContent = "click watermelon to game start";
-    guideblock.style.top = "270px";
-    guideblock.style.left = "90px";
+    guideblock.style.top = "17rem";
+    guideblock.style.left = "4rem";
     guideblock.style.color = "white";
 	  guideblock.style.fontSize = "large";
     guideblock.style.position = "absolute";
