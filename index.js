@@ -102,7 +102,7 @@ function main() {
     skybox.material = skyboxMaterial;
 
     // 砂浜
-    const sandyBeach = new BABYLON.StandardMaterial("largeGroundMat");
+    const sandyBeach = new BABYLON.StandardMaterial("sandyBeach");
     sandyBeach.diffuseTexture = new BABYLON.Texture("./textures/sandyBeach.jpeg");
 
     // subdivisions の値が大きいほど、グラデーションが細かくなります。
