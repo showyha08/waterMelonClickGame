@@ -18,8 +18,8 @@ function main() {
     const scoreBlock = new BABYLON.GUI.TextBlock();
     scoreBlock.text = point + "pt";
     scoreBlock.fontSize = 20;
-    scoreBlock.top = -220;
-    scoreBlock.left = -300;
+    scoreBlock.top = -300;
+    scoreBlock.left = -150;
     scoreBlock.color = "black";
     advancedTexture.addControl(scoreBlock);
 
@@ -27,16 +27,16 @@ function main() {
     const timerblock = new BABYLON.GUI.TextBlock();
     timerblock.text = "Time:" + timeLimit;
     timerblock.fontSize = 20;
-    timerblock.top = -220;
-    timerblock.left = 300;
+    timerblock.top = -300;
+    timerblock.left = 150;
     timerblock.color = "black";
     advancedTexture.addControl(timerblock);
 
     // ガイドテキスト表示
     const guideblock = document.createElement("p");
     guideblock.textContent = "click watermelon to game start";
-    guideblock.style.top = "200px";
-    guideblock.style.left = "260px";
+    guideblock.style.top = "270px";
+    guideblock.style.left = "90px";
     guideblock.style.color = "white";
 	  guideblock.style.fontSize = "large";
     guideblock.style.position = "absolute";
