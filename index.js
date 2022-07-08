@@ -38,7 +38,7 @@ function main() {
     guideblock.style.top = "17rem";
     guideblock.style.left = "4rem";
     guideblock.style.color = "white";
-	  guideblock.style.fontSize = "large";
+    guideblock.style.fontSize = "large";
     guideblock.style.position = "absolute";
     document.body.appendChild(guideblock);
 
@@ -96,7 +96,7 @@ function main() {
       scene
     );
     skyboxMaterial.reflectionTexture.coordinatesMode =
-      BABYLON.Texture.SKYBOX_MODE;
+    BABYLON.Texture.SKYBOX_MODE;
     skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
     skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
     skybox.material = skyboxMaterial;
@@ -109,7 +109,7 @@ function main() {
     const largeGround = BABYLON.MeshBuilder.CreateGroundFromHeightMap(
       "ground",
       "./textures/sandyBeach.jpeg",
-      { width: 25, height: 25, subdivisions: 20, minHeight: 0, maxHeight: 1 }
+      { width: 25, height: 25, subdivisions: 200, minHeight: 0, maxHeight: 1 }
     );
     largeGround.material = sandyBeach;
 
@@ -136,7 +136,7 @@ function main() {
           watermelon.position.x = getRandomCoordinate(maxCoordinate);
           watermelon.position.z = getRandomCoordinate(maxCoordinate);
 
-		      // スコア更新
+          // スコア更新
           point++;
           scoreBlock.text = point + "pt";
           advancedTexture.unRegisterClipboardEvents();
@@ -148,7 +148,7 @@ function main() {
       return Math.round(Math.random() * max) - max / 2;
 	}
 
-	// カウントダウン
+    // カウントダウン
     setInterval(() => {
       if (!startFlg) return;
       if (timeLimit > 0) {
