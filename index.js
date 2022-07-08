@@ -59,6 +59,7 @@ function main() {
       scoreBlock.text = point + "pt";
       timeLimit = initialTime;
       timerblock.text = "Time:" + timeLimit;
+      guideblock.textContent = "click watermelon to game start";
       guideblock.style.display = "";
       advancedTexture.unRegisterClipboardEvents();
     });
@@ -156,6 +157,8 @@ function main() {
         advancedTexture.unRegisterClipboardEvents();
       } else {
         startFlg = false;
+        guideblock.textContent = "time up!"
+        guideblock.style.display = "";
       }
     }, 1000);
 
