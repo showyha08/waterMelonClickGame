@@ -109,7 +109,7 @@ function main() {
     const largeGround = BABYLON.MeshBuilder.CreateGroundFromHeightMap(
       "ground",
       "./textures/sandyBeach.jpeg",
-      { width: 25, height: 25, subdivisions: 200, minHeight: 0, maxHeight: 1 }
+      { width: 25, height: 25, subdivisions: 20, minHeight: 0, maxHeight: 1 }
     );
     largeGround.material = sandyBeach;
 
