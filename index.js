@@ -3,6 +3,12 @@ function main() {
   const engine = new BABYLON.Engine(canvas);
   const initialTime = 10;
   const initialPoint = 0;
+  const maxCoordinate = 9;
+  const groundWidth = 25;
+  const groundHight = 25;
+  const groundSubdivisions = 20;
+  let melonDisplayTime = 1;
+
   function createScene() {
     const scene = new BABYLON.Scene(engine);
     // babylon.jsでGUI使う
@@ -19,7 +25,7 @@ function main() {
     scoreBlock.text = point + "pt";
     scoreBlock.fontSize = 20;
     scoreBlock.top = -300;
-    scoreBlock.left = -150;
+    scoreBlock.paddingRight = "60%";
     scoreBlock.color = "black";
     advancedTexture.addControl(scoreBlock);
 
@@ -28,7 +34,7 @@ function main() {
     timerblock.text = "Time:" + timeLimit;
     timerblock.fontSize = 20;
     timerblock.top = -300;
-    timerblock.left = 150;
+    timerblock.paddingLeft = "60%";
     timerblock.color = "black";
     advancedTexture.addControl(timerblock);
 
@@ -43,27 +49,16 @@ function main() {
     document.body.appendChild(guideblock);
 
     // リセットボタン表示
-    const restartButtom = BABYLON.GUI.Button.CreateSimpleButton("Reset", "Reset");
+    const restartButtom = BABYLON.GUI.Button.CreateSimpleButton(
+      "Reset",
+      "Reset"
+    );
     restartButtom.width = "150px";
     restartButtom.height = "40px";
-    restartButtom.top = "210";
+    restartButtom.top = "25%";
     restartButtom.color = "white";
     restartButtom.cornerRadius = 20;
     restartButtom.background = "green";
-
-    // クリック時のイベントを設定
-    restartButtom.onPointerUpObservable.add(function () {
-      watermelon.position.x = 0;
-      watermelon.position.z = 0;
-      point = initialPoint;
-      scoreBlock.text = point + "pt";
-      timeLimit = initialTime;
-      timerblock.text = "Time:" + timeLimit;
-      guideblock.textContent = "click watermelon to game start";
-      guideblock.style.display = "";
-      advancedTexture.unRegisterClipboardEvents();
-    });
-    advancedTexture.addControl(restartButtom);
 
     // カメラとライトの設定
     const camera = new BABYLON.ArcRotateCamera(
@@ -78,7 +73,8 @@ function main() {
       "light",
       new BABYLON.Vector3(1, 1, 0)
     );
-    camera.upperBetaLimit = Math.PI / 2.2;
+    camera.lowerRadiusLimit = 5;
+    camera.upperBetaLimit = Math.PI / 2.4;
 
     // スカイボックスの設定
     // 立方体の内側の面にテクスチャを貼り付ける
@@ -97,20 +93,28 @@ function main() {
       scene
     );
     skyboxMaterial.reflectionTexture.coordinatesMode =
-    BABYLON.Texture.SKYBOX_MODE;
+      BABYLON.Texture.SKYBOX_MODE;
     skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
     skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
     skybox.material = skyboxMaterial;
 
     // 砂浜
     const sandyBeach = new BABYLON.StandardMaterial("sandyBeach");
-    sandyBeach.diffuseTexture = new BABYLON.Texture("./textures/sandyBeach.jpeg");
+    sandyBeach.diffuseTexture = new BABYLON.Texture(
+      "./textures/sandyBeach.jpeg"
+    );
 
     // subdivisions の値が大きいほど、グラデーションが細かくなります。
     const largeGround = BABYLON.MeshBuilder.CreateGroundFromHeightMap(
       "ground",
       "./textures/sandyBeach.jpeg",
-      { width: 25, height: 25, subdivisions: 20, minHeight: 0, maxHeight: 1 }
+      {
+        width: groundWidth,
+        height: groundHight,
+        subdivisions: groundSubdivisions,
+        minHeight: 0,
+        maxHeight: 1,
+      }
     );
     largeGround.material = sandyBeach;
 
@@ -133,7 +137,6 @@ function main() {
           guideblock.style.display = "none";
 
           // 最大座標の範囲内でスイカを動かす
-          const maxCoordinate = 9;
           watermelon.position.x = getRandomCoordinate(maxCoordinate);
           watermelon.position.z = getRandomCoordinate(maxCoordinate);
 
@@ -145,9 +148,54 @@ function main() {
       )
     );
 
-    function getRandomCoordinate(max) {
-      return Math.round(Math.random() * max) - max / 2;
-	}
+    var animating = null;
+    // メロン
+    BABYLON.SceneLoader.ImportMeshAsync("", "./meshes/", "melon.babylon").then(
+      () => {
+        const melon = scene.getMeshByName("melon");
+        melon.position.y = 1000;
+        const melonTexture = new BABYLON.StandardMaterial("melonTexture");
+        melonTexture.diffuseTexture = new BABYLON.Texture(
+          "./textures/melonPattern.jpg"
+        );
+        melon.material = melonTexture;
+        melon.actionManager = new BABYLON.ActionManager(scene);
+        melon.actionManager.registerAction(
+          new BABYLON.ExecuteCodeAction(
+            BABYLON.ActionManager.OnPickTrigger,
+            function (evt) {
+              if (timeLimit <= 0) return;
+              if (!startFlg) return;
+              // 最大座標の範囲内でメロンを動かす
+              melon.position.x = getRandomCoordinate(maxCoordinate);
+              melon.position.z = getRandomCoordinate(maxCoordinate);
+              // スコア2倍
+              point = point * 2;
+              scoreBlock.text = point + "pt";
+              advancedTexture.unRegisterClipboardEvents();
+              melon.setEnabled(false);
+            }
+          )
+        );
+        animating = scene.beginAnimation(melon, 0, 60, true);
+        animating.pause()
+
+        // リセットボタンクリック時のイベントを設定
+        restartButtom.onPointerUpObservable.add(function () {
+          watermelon.position.x = 0;
+          watermelon.position.z = 0;
+          melon.position.y = 1000;
+          point = initialPoint;
+          scoreBlock.text = point + "pt";
+          timeLimit = initialTime;
+          timerblock.text = "Time:" + timeLimit;
+          guideblock.textContent = "click watermelon to game start";
+          guideblock.style.display = "";
+          startFlg = false;
+          melon.setEnabled(true);
+          advancedTexture.unRegisterClipboardEvents();
+        });
+        advancedTexture.addControl(restartButtom);
 
     // カウントダウン
     setInterval(() => {
@@ -157,10 +205,23 @@ function main() {
         advancedTexture.unRegisterClipboardEvents();
       } else {
         startFlg = false;
-        guideblock.textContent = "time up!"
+        guideblock.textContent = "time up!";
         guideblock.style.display = "";
+        melon.position.y = 1000;
+        animating.pause();
+      }
+      // 2秒間
+      if (timeLimit === melonDisplayTime) {
+        melon.position.y = 1.05;
+        animating = scene.beginAnimation(melon, 0, 60, false);
       }
     }, 1000);
+      }
+    );
+
+    function getRandomCoordinate(max) {
+      return Math.round(Math.random() * max) - max / 2;
+    }
 
     return scene;
   }

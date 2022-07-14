@@ -1,0 +1,73 @@
+function main() {
+	const canvas = document.getElementById("renderCanvas");
+	const engine = new BABYLON.Engine(canvas);
+	function createScene() {
+		const scene = new BABYLON.Scene(engine);
+
+    // メロンを生成
+    const melon = BABYLON.MeshBuilder.CreateSphere("melon", {});
+    melon.position.y = 1.05;
+    const animSpin = new BABYLON.Animation(
+      "melonAnimation",
+      "rotation.z",
+      60,
+      BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+      BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+    );
+
+    const wheelKeys = [];
+
+    //At the animation key 0, the value of rotation.y is 0
+    wheelKeys.push({
+      frame: 0,
+      value: 10,
+    });
+
+    //At the animation key 30, (after 1 sec since animation fps = 30) the value of rotation.y is 2PI for a complete rotation
+    wheelKeys.push({
+      frame: 30,
+      value: 2 * Math.PI,
+    });
+
+    const animCar = new BABYLON.Animation(
+      "melonMoveAnimation",
+      "position.x",
+      30,
+      BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+      BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+    );
+    const carKeys = [];
+
+    carKeys.push({
+      frame: 0,
+      value: -groundWidth / 2,
+    });
+
+    carKeys.push({
+      frame: 60,
+      value: groundWidth / 2,
+    });
+
+    //set the keys
+    animSpin.setKeys(wheelKeys);
+    animCar.setKeys(carKeys);
+
+    //Link this animation to the right back wheel
+    melon.animations = [];
+    melon.animations.push(animSpin);
+    melon.animations.push(animCar);
+
+    // //Begin animation - object to animate, first frame, last frame and loop if true
+    scene.beginAnimation(melon, 0, 60, true);
+		return scene;
+	}
+
+	const scene = createScene();
+	engine.runRenderLoop(() => {
+	  scene.render();
+	});
+	window.addEventListener("resize", () => {
+	  engine.resize();
+	});
+  }
+  window.addEventListener("DOMContentLoaded", main);
